@@ -18,20 +18,24 @@ def upload():
         return 'No selected file', 400
     
     # Salvar o arquivo na pasta correta
-    file.save(os.path.join('uploads', file.filename))
-    return redirect('/')
+    upload_folder = 'uploads'
+    os.makedirs(upload_folder, exist_ok=True)  # Cria a pasta se não existir
+    file.save(os.path.join(upload_folder, file.filename))
+    return redirect('/process')
 
 @app.route('/process', methods=['POST'])
 def process():
     planilha_caminho = 'planilha.xlsx'  
     pasta_fotos_caminho = 'Fotos'  
 
+    # Verifica se a planilha e a pasta de fotos existem
     if not os.path.exists(planilha_caminho):  
         raise FileNotFoundError(f"Planilha não encontrada: {planilha_caminho}")  
 
     if not os.path.exists(pasta_fotos_caminho):  
         raise FileNotFoundError(f"Pasta de fotos não encontrada: {pasta_fotos_caminho}")  
 
+    # Lê a planilha
     df = pd.read_excel(planilha_caminho, dtype=str)  
 
     if 'Foto' not in df.columns or 'Equipamento' not in df.columns:  
